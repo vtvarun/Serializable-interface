@@ -1,44 +1,78 @@
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable{
+    String name;
+    int salary;
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "name='" + name + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+
+    Employee(String name, int salary){
+        this.salary = salary;
+        this.name = name;
+    }
+
+}
+
 public class Main {
 
-    public static void main(String[] args) {
 
-        // Abstract Factory Design Pattern
-        //
-        // Please read this analogy to understand both abstract factory design pattern
-        // and factory design pattern
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
+        Employee emp = new Employee("Tanwar",123123);
+        Student student1 = new Student("varun",1232,emp);
 
-        // Imagine you are working for Nike (yes, the shoes brand)
-        // Again imagine, that Nike has a factory for shoes
-        // keep imagining, Nike has another factory for bags
-        // and Nike has another factory for t-shirts
-        // So far, we have imagined that nike has three different factories for shoes, bags and
-        // t-shirts
+        // now, i would like to serialize it and serialization means to
+        // convert an object into stream of bytes, so that it can be stored in file or database
+        File fileName = new File("serialized.txt");
+        FileOutputStream fos = new FileOutputStream(fileName);
+        ObjectOutputStream dos = new ObjectOutputStream(fos);
 
-        // now imagine that you are working as a manager of shoes factory of Nike
-        // only the manager of shoes factory not other factories
-        // and your kid wants you to get a pair of shoes for him or her.
-        // so as a manager you will tell your factory to create shoes
+        // writing an object to the declared file
+        dos.writeObject(student1);
 
-        // this is called factory design pattern :
-        // now think that you are a main function that is not creating objects / shoes
-        // on your own, rather you told the factory class to create the objects / shoes
+        // static attribute do not get serialized
+        emp.name = "Rajput";
 
-        // now after some days, you got a promotion and became a manager of managers
-        // so you have three managers under you, three of them are managers of the three factories
-        // and you are managing all three managers
-        // let's say now your son wants a nike bag, so you as a manager will call the manager of nike bags factory
-        // and that factory manager will call the factory to create objects for you.
+        FileInputStream fis = new FileInputStream(fileName);
+        ObjectInputStream ois = new ObjectInputStream(fis);
 
-        // it's nothing but factory calling factory to create objets
+        // deserialization is happening
+        Student obj = (Student)ois.readObject();
 
-        Factory factory = AbstractFactory.createFactory("bmw");
-        System.out.println(factory.factoryName());
+        System.out.println(obj.toString());
 
-        Vehicle v = factory.createVehicle(2);
-        System.out.println(v.wheels());
-
-        Vehicle v1 = factory.createVehicle(4);
-        System.out.println(v1.wheels());
     }
 }
+
+
+class Student implements Serializable{
+    String studentName;
+
+    transient int studentRollNo;
+
+    static Employee emp1;
+
+    public Student(String studentName, Integer studentRollNo, Employee e){
+        this.studentName = studentName;
+        this.studentRollNo = studentRollNo;
+        this.emp1 = e;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "studentName='" + studentName + '\'' +
+                ", studentRollNo=" + studentRollNo +
+                ", emp1=" + emp1.toString() +
+                '}';
+    }
+}
+
+
